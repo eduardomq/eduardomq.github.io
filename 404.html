@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amiiteca</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/amiiteca/logo.png">
+<meta property="og:title" content="Un amiibo en Amiiteca">
+<meta property="og:description" content="Ábrelo en tu móvil con Amiiteca.">
+<meta property="og:image" content="https://eduardomq.github.io/amiiteca/logo.png">
+<!--
+  GitHub Pages no tiene rutas dinámicas: no puede haber una página por amiibo. Este
+  fichero es el que sirve para CUALQUIER ruta que no exista, así que hace de página de
+  /amiiteca/a/<headTail>: lee el identificador de la dirección y busca el amiibo en el mismo
+  catálogo que usa la app.
+
+  Con Amiiteca instalada y el dominio verificado, Android abre la app directamente y
+  esta página no llega a cargarse. Se ve cuando no está instalada, cuando el enlace se
+  abre en un ordenador, o cuando se abre desde dentro del navegador, que no suelta un
+  enlace de su mismo dominio: para eso está el botón "Abrir en Amiiteca".
+-->
+<style>
+  :root {
+    --bg: #111318; --card: #1d2026; --text: #e6e8ee; --muted: #a0a4ad;
+    --accent: #e60012; --accent-text: #ffffff;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f7f8fc; --card: #ffffff; --text: #1a1c21; --muted: #5d616a;
+      --accent: #e60012; --accent-text: #ffffff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 20px 24px 28px;
+    width: 100%;
+    max-width: 380px;
+    border-top: 4px solid var(--accent);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    margin-bottom: 16px;
+  }
+  .brand img {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    margin: 0;
+  }
+  #image {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 12px;
+  }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .series { color: var(--muted); margin: 0 0 20px; }
+  p { color: var(--muted); line-height: 1.5; margin: 12px 0; }
+  .button {
+    display: block;
+    box-shadow: 0 6px 18px rgba(230, 0, 18, 0.25);
+    background: var(--accent);
+    color: var(--accent-text);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: 999px;
+    margin: 20px 0 8px;
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <a class="brand" href="/amiiteca/"><img src="/amiiteca/logo.png" alt="">Amiiteca</a>
+    <div id="amiibo" class="hidden">
+      <img id="image" alt="">
+      <h1 id="name">Un amiibo</h1>
+      <p id="series" class="series"></p>
+      <a id="open" class="button" href="#">Abrir en Amiiteca</a>
+      <p>Amiiteca es una app Android de uso personal. No está en ninguna tienda.</p>
+    </div>
+
+    <div id="missing">
+      <h1>Aquí no hay nada</h1>
+      <p>Esta dirección no existe.</p>
+    </div>
+  </div>
+
+<script>
+  // Tiene que coincidir con ShareLink.kt en la app.
+  var PACKAGE = "com.edu.amiiteca";
+  var CATALOG = "https://raw.githubusercontent.com/8bitDream/AmiiboAPI/master";
+
+  var match = location.pathname.match(/^\/amiiteca\/a\/([0-9a-fA-F]{16})\/?$/);
+  if (match) {
+    var headTail = match[1].toLowerCase();
+    var head = headTail.slice(0, 8), tail = headTail.slice(8);
+
+    document.getElementById("missing").classList.add("hidden");
+    document.getElementById("amiibo").classList.remove("hidden");
+
+    // Un intent:// porque el navegador no pasa a la app un enlace de su propio dominio.
+    // Si la app no está, vuelve a la portada en vez de ir a una tienda donde no está.
+    document.getElementById("open").href =
+      "intent://eduardomq.github.io/amiiteca/a/" + headTail +
+      "#Intent;scheme=https;package=" + PACKAGE +
+      ";S.browser_fallback_url=" + encodeURIComponent("https://eduardomq.github.io/amiiteca/") +
+      ";end";
+
+    var image = document.getElementById("image");
+    image.src = CATALOG + "/images/icon_" + head + "-" + tail + ".png";
+    image.onerror = function () { image.classList.add("hidden"); };
+
+    // El nombre sale del mismo catálogo que usa la app. Si no carga, se queda "Un amiibo".
+    fetch(CATALOG + "/database/amiibo.json")
+      .then(function (r) { return r.json(); })
+      .then(function (db) {
+        var entry = db.amiibos["0x" + headTail];
+        if (!entry) return;
+        document.getElementById("name").textContent = entry.name;
+        image.alt = entry.name;
+        document.title = entry.name + " · Amiiteca";
+        var series = db.game_series && db.game_series["0x" + head.slice(0, 3)];
+        if (series) document.getElementById("series").textContent = series;
+      })
+      .catch(function () {});
+  }
+</script>
+</body>
+</html>

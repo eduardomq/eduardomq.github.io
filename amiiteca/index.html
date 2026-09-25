@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amiiteca</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/amiiteca/logo.png">
+<meta property="og:title" content="Amiiteca">
+<meta property="og:description" content="Tu colección de amiibo, en el móvil.">
+<meta property="og:image" content="https://eduardomq.github.io/amiiteca/logo.png">
+<style>
+  :root { --bg: #111318; --card: #1d2026; --text: #e6e8ee; --muted: #a0a4ad; --brand: #e60012; }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f7f8fc; --card: #ffffff; --text: #1a1c21; --muted: #5d616a; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 36px 24px 28px;
+    width: 100%;
+    max-width: 380px;
+    border-top: 4px solid var(--brand);
+  }
+  .logo {
+    width: 96px;
+    height: 96px;
+    border-radius: 24px;
+    display: block;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 24px rgba(230, 0, 18, 0.25);
+  }
+  h1 { font-size: 1.6rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+  p { color: var(--muted); line-height: 1.55; margin: 10px 0; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <img class="logo" src="/amiiteca/logo.png" alt="Amiiteca">
+    <h1>Amiiteca</h1>
+    <p>
+      Una app Android para organizar una colección de amiibo y escribirlos en un
+      llavero AmiiboLink.
+    </p>
+    <p>
+      Es de uso personal y no está publicada en ninguna tienda. Si te han mandado un
+      enlace a un amiibo y no se ha abierto, es que no tienes la app instalada en este
+      dispositivo.
+    </p>
+  </div>
+</body>
+</html>
